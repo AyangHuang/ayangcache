@@ -26,8 +26,10 @@ type cache struct {
 	addBuf chan *item
 	// 获取缓存后，需要修改缓存获取频率（LFU）或移到队首（LRU）等操作，直接丢入这个 buffer，有异步协程调用 policy 提供的接口处理
 	getBuf ringBuffer
-	// 循环定时器，每隔一段时间触发并扫描过去一段时间过期的 key 并清除
+	// 循环定时器，每隔一段时间触发并调用 expiration.Clean 扫描过去一段时间过期的 key 并清除
 	cleanupTicker *time.Ticker
+	// 按过期时间分桶存储 key，定期删除一部分 key
+	expiration expiration
 }
 
 func (c *cache) Get(key interface{}) (interface{}, bool) {
