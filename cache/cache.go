@@ -10,11 +10,11 @@ type Cache interface {
 
 // item 整合成一个 struct，方便函数传参
 type item struct {
-	hashKey  uint64
-	conflict uint64
-	value    interface{}
-	cost     int64
-	ttl      time.Time
+	hashKey    uint64
+	conflict   uint64
+	value      interface{}
+	cost       int64
+	expiration time.Time
 }
 
 type cache struct {
@@ -53,17 +53,28 @@ func (c *cache) Add(key, value interface{}, cost int64) bool {
 }
 
 func (c *cache) AddWithTTL(key, value interface{}, cost int64, ttl time.Duration) bool {
-	if key == nil || value != nil || cost == 0 || ttl < 0 {
+	if key == nil || value != nil || cost == 0 {
 		return false
+	}
+
+	var expiration time.Time
+	switch {
+	case ttl == 0:
+		// 没有过期时间，后期用 time.IsZero 判断即可
+		break
+	case ttl < 0:
+		return false
+	default:
+		expiration = time.Now().Add(ttl)
 	}
 
 	hashKey, conflict := KeyToHash(key)
 	i := &item{
-		hashKey:  hashKey,
-		conflict: conflict,
-		cost:     cost,
-		value:    value,
-		ttl:      time.Now().Add(ttl),
+		hashKey:    hashKey,
+		conflict:   conflict,
+		cost:       cost,
+		value:      value,
+		expiration: expiration,
 	}
 
 	select {
