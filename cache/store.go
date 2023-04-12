@@ -76,15 +76,18 @@ func (m *concurrentMap) get(hashKey, conflict uint64) (interface{}, bool) {
 func (m *concurrentMap) add(hashKey, conflict uint64, value interface{}, expiration time.Time) bool {
 	m.mutex.Lock()
 
-	// hashKey 已存在，当然可能 conflict 不相等，但这种情况是不能存进去的，map 的 key 不允许重复，会覆盖原来的 key
-	if _, ok := m.date[hashKey]; ok {
+	if !expiration.IsZero() && expiration.Before(time.Now()) {
 		m.mutex.Unlock()
 		return false
 	}
 
-	if !expiration.IsZero() && expiration.Before(time.Now()) {
-		m.mutex.Unlock()
-		return false
+	// hashKey 已存在，当然可能 conflict 不相等，但这种情况是不能存进去的，map 的 key 不允许重复，会覆盖原来的 key
+	// hashKey 已存在，但是过期了，直接覆盖存进去就可以了
+	if item, ok := m.date[hashKey]; ok {
+		if item.expiration.IsZero() || item.expiration.After(time.Now()) {
+			m.mutex.Unlock()
+			return false
+		}
 	}
 
 	m.date[hashKey] = &storeItem{
