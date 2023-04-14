@@ -2,6 +2,11 @@ package cache
 
 import "time"
 
+const (
+	addBufSize     = 1024 * 32
+	ringBufferSize = 64
+)
+
 type Cache interface {
 	Get(key interface{}) (interface{}, bool)
 	Add(key, val interface{}, cost int64) bool
@@ -32,6 +37,29 @@ type cache struct {
 	expiration expiration
 }
 
+// NewCache
+// numCount 表示计数器的数量，建议为实际最大存储数量的 10 倍
+// maxCost 为最大存储 cost 总数
+func NewCache(numCount, maxCost int64, fns ...optionFn) *cache {
+	c := &cache{
+		store:         newShareStore(),
+		policy:        newDefaultPolicy(numCount, maxCost),
+		addBuf:        make(chan *item, addBufSize),
+		expiration:    newExpirationMap(),
+		cleanupTicker: time.NewTicker(time.Duration(ticker)),
+	}
+	c.getBuf = newRingBufferPool(c.policy, ringBufferSize)
+
+	for i := range fns {
+		fns[i](c)
+	}
+
+	// 开启守护协程异步处理
+	go c.process()
+
+	return c
+}
+
 func (c *cache) Get(key interface{}) (interface{}, bool) {
 	if key == nil {
 		return nil, false
@@ -55,7 +83,7 @@ func (c *cache) Add(key, value interface{}, cost int64) bool {
 }
 
 func (c *cache) AddWithTTL(key, value interface{}, cost int64, ttl time.Duration) bool {
-	if key == nil || value != nil || cost == 0 {
+	if key == nil || value == nil || cost == 0 {
 		return false
 	}
 
@@ -88,4 +116,36 @@ func (c *cache) AddWithTTL(key, value interface{}, cost int64, ttl time.Duration
 	}
 
 	return false
+}
+
+func (c *cache) process() {
+	for {
+		select {
+		// 利用 chan 快速处理 add
+		case item := <-c.addBuf:
+			// 准入策略和淘汰策略
+			out, ok := c.policy.Add(item.hashKey, item.cost)
+			if ok {
+				c.store.Add(item.hashKey, item.conflict, item.value, item.expiration)
+			}
+
+			// 从 store 中清除淘汰的
+			for i := 0; i < len(out); i++ {
+				c.store.Del(out[i], 0)
+			}
+
+		// 定时删除过期 key
+		case <-c.cleanupTicker.C:
+			c.expiration.Clean(c.store, c.policy)
+		}
+	}
+}
+
+type optionFn func(*cache)
+
+// OptionRingBufferSize 建议 64
+func OptionRingBufferSize(cap int) func(c *cache) {
+	return func(c *cache) {
+		c.getBuf = newRingBufferPool(c.policy, cap)
+	}
 }

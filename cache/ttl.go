@@ -8,6 +8,8 @@ import (
 const (
 	// secondsPerBucket 该大小为时间周期，同一过期时间周期处于同一个 bucket
 	secondsPerBucket = int64(5)
+	// 过期周期的一半就检查，保证不会因延误而漏删
+	ticker = secondsPerBucket / 2
 )
 
 func expirationBucket(time time.Time) int64 {

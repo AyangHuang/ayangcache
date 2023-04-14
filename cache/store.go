@@ -106,8 +106,9 @@ func (m *concurrentMap) del(hashKey, conflict uint64) (interface{}, bool) {
 
 	item, ok := m.date[hashKey]
 
-	// 不存在或者 conflict 不相等
-	if !ok || item.conflict != conflict {
+	// 不存在或者 conflict 不相等(conflict != 0 表示不用看 conflict)
+	// 因为 policy 只存 hashKey，不存 conflict，所以从 policy 淘汰只需要用到 key
+	if !ok || (item.conflict != 0 && item.conflict != conflict) {
 		m.mutex.Unlock()
 		return nil, false
 	}
