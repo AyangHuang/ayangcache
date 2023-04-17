@@ -40,7 +40,7 @@ type cache struct {
 // NewCache
 // numCount 表示计数器的数量，建议为实际最大存储数量的 10 倍
 // maxCost 为最大存储 cost 总数
-func NewCache(numCount, maxCost int64, fns ...optionFn) *cache {
+func NewCache(numCount, maxCost int64, fns ...optionFn) Cache {
 	c := &cache{
 		store:         newShareStore(),
 		policy:        newDefaultPolicy(numCount, maxCost),
