@@ -47,12 +47,12 @@ func Client(keys ...string) {
 
 	for index := range keys {
 		req = &RequestBody{
-			seq: uint64(index),
-			key: keys[index],
+			Seq: uint64(index),
+			Key: keys[index],
 		}
 
 		err = codec.WriteRequest(req)
-		fmt.Println("------------client send", "seq:", req.seq, "key:", req.key)
+		fmt.Println("------------client send", "seq:", req.Seq, "key:", req.Key)
 		if err != nil {
 			fmt.Println(err.Error())
 			return
@@ -61,7 +61,7 @@ func Client(keys ...string) {
 		resp = &ResponseBody{}
 		err = codec.ReadResponseBody(resp)
 
-		fmt.Println("------------client receive", "seq:", resp.seq, "value:", string(resp.value), "err:", resp.err)
+		fmt.Println("------------client receive", "seq:", resp.Seq, "value:", string(resp.Value), "err:", resp.Err)
 	}
 
 }

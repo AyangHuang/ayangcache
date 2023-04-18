@@ -80,8 +80,8 @@ func (proto *ProtobufCodec) ReadRequestBody(body *RequestBody) error {
 		return err
 	}
 
-	body.seq = pBody.GetSeq()
-	body.key = pBody.GetKey()
+	body.Seq = pBody.GetSeq()
+	body.Key = pBody.GetKey()
 
 	return nil
 
@@ -109,17 +109,17 @@ func (proto *ProtobufCodec) ReadResponseBody(body *ResponseBody) error {
 		return err
 	}
 
-	body.seq = pBody.GetSeq()
-	body.value = pBody.GetValue()
-	body.err = pBody.GetErr()
+	body.Seq = pBody.GetSeq()
+	body.Value = pBody.GetValue()
+	body.Err = pBody.GetErr()
 	return nil
 }
 
 func (proto *ProtobufCodec) WriteRequest(body *RequestBody) error {
 	var err error
 	message := &protobuf.RequestBody{
-		Seq: body.seq,
-		Key: body.key,
+		Seq: body.Seq,
+		Key: body.Key,
 	}
 
 	// 需要验证大小，超出 16 bit 不行，这里就不处理了
@@ -141,9 +141,9 @@ func (proto *ProtobufCodec) WriteRequest(body *RequestBody) error {
 func (proto *ProtobufCodec) WriteResponse(body *ResponseBody) error {
 	var err error
 	message := &protobuf.ResponseBody{
-		Seq:   body.seq,
-		Value: body.value,
-		Err:   body.err,
+		Seq:   body.Seq,
+		Value: body.Value,
+		Err:   body.Err,
 	}
 
 	// 需要验证大小，超出 16 bit 不行。简单一点，这里就不处理了。

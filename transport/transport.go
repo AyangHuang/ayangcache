@@ -48,7 +48,7 @@ func (t *transport) GetFromPeer(addr string, key string) ([]byte, error) {
 	call := &call{
 		addr: addr,
 		RequestBody: &RequestBody{
-			key: key,
+			Key: key,
 		},
 		valCh:   make(chan []byte),
 		timeout: timeoutCtx,

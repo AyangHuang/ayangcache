@@ -160,10 +160,10 @@ func (conn *clientConn) handleRequest(req *RequestBody) func() {
 
 		// 构造 response
 		resp := &ResponseBody{
-			seq: req.seq,
+			Seq: req.Seq,
 		}
 
-		byteView, err := conn.server.getValueFunc(req.key)
+		byteView, err := conn.server.getValueFunc(req.Key)
 
 		// 为什么不像 transport.GetFromPeer 那种开启一个协程和一个计时器来实现超时？
 		// 其实那种是超时了需要立刻返回的情况，但我这里超时了就超时了，不用一到超时时间就返回，可以一直等到超时结束
@@ -174,9 +174,9 @@ func (conn *clientConn) handleRequest(req *RequestBody) func() {
 
 		// 把 error 传递回给客户端
 		if err == nil {
-			resp.value = byteView.ByteSlice()
+			resp.Value = byteView.ByteSlice()
 		} else {
-			resp.err = err.Error()
+			resp.Err = err.Error()
 		}
 
 		// 发送给客户端

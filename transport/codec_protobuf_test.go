@@ -45,12 +45,12 @@ func TestProtobufCodec_WriteRequest_ReadRequestBody(t *testing.T) {
 	c := NewProtobufCodec(stream)
 
 	req1 := &RequestBody{
-		seq: 1,
-		key: "ayang",
+		Seq: 1,
+		Key: "ayang",
 	}
 	req2 := &RequestBody{
-		seq: 2,
-		key: "tom",
+		Seq: 2,
+		Key: "tom",
 	}
 
 	_ = c.WriteRequest(req1)
@@ -62,11 +62,11 @@ func TestProtobufCodec_WriteRequest_ReadRequestBody(t *testing.T) {
 	_ = c.ReadRequestBody(req11)
 	_ = c.ReadRequestBody(req22)
 
-	if req1.seq == req11.seq && req1.key == req11.key {
+	if req1.Seq == req11.Seq && req1.Key == req11.Key {
 	} else {
 		t.Error("error")
 	}
-	if req2.seq == req22.seq && req2.key == req22.key {
+	if req2.Seq == req22.Seq && req2.Key == req22.Key {
 	} else {
 		t.Error("error")
 	}
@@ -79,12 +79,12 @@ func TestProtobufCodec_WriteResponse_ReadResponseBody(t *testing.T) {
 	c := NewProtobufCodec(stream)
 
 	req1 := &ResponseBody{
-		seq:   1,
-		value: []byte("ayang"),
+		Seq:   1,
+		Value: []byte("ayang"),
 	}
 	req2 := &ResponseBody{
-		seq:   2,
-		value: []byte("tom"),
+		Seq:   2,
+		Value: []byte("tom"),
 	}
 
 	_ = c.WriteResponse(req1)
@@ -96,11 +96,11 @@ func TestProtobufCodec_WriteResponse_ReadResponseBody(t *testing.T) {
 	_ = c.ReadResponseBody(req11)
 	_ = c.ReadResponseBody(req22)
 
-	if req1.seq == req11.seq && string(req1.value) == string(req11.value) {
+	if req1.Seq == req11.Seq && string(req1.Value) == string(req11.Value) {
 	} else {
 		t.Error("error")
 	}
-	if req2.seq == req22.seq && string(req2.value) == string(req22.value) {
+	if req2.Seq == req22.Seq && string(req2.Value) == string(req22.Value) {
 	} else {
 		t.Error("error")
 	}
@@ -112,18 +112,18 @@ func TestProtobufCodec_WriteResponse_ReadResponseBody(t *testing.T) {
 // func Unmarshal(b []byte, m Message) error
 func TestProtobuf(t *testing.T) {
 	resp := &ResponseBody{
-		seq:   2,
-		value: []byte("tom"),
+		Seq:   2,
+		Value: []byte("tom"),
 	}
 
 	var err error
 	message1 := &protobuf.ResponseBody{
-		Seq:   resp.seq,
-		Value: resp.value,
+		Seq:   resp.Seq,
+		Value: resp.Value,
 	}
 	message2 := &protobuf.ResponseBody{
-		Seq:   resp.seq,
-		Value: resp.value,
+		Seq:   resp.Seq,
+		Value: resp.Value,
 	}
 
 	bytes, err := proto.Marshal(message1)

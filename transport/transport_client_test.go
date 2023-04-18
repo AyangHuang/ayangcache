@@ -42,10 +42,10 @@ func Server(addr string) {
 			fmt.Println(err.Error())
 		}
 
-		fmt.Println("-----server receive:", req.key, ":", req.seq)
-		if req.key == "timeout" {
+		fmt.Println("-----server receive:", req.Key, ":", req.Seq)
+		if req.Key == "timeout" {
 			time.Sleep(7 * time.Second)
-		} else if req.key == "close" {
+		} else if req.Key == "close" {
 			// 关闭改条连接
 			_ = conn.Close()
 			// 关闭服务器监听 socket
@@ -53,16 +53,16 @@ func Server(addr string) {
 			return
 		}
 
-		v, ok := m[req.key]
+		v, ok := m[req.Key]
 		resp := &ResponseBody{
-			seq:   req.seq,
-			value: v,
+			Seq:   req.Seq,
+			Value: v,
 		}
 		if !ok {
-			resp.err = "no this cache"
+			resp.Err = "no this cache"
 		}
 
-		fmt.Println("server send", resp.seq, ":", string(resp.value))
+		fmt.Println("server send", resp.Seq, ":", string(resp.Value))
 
 		err = codec.WriteResponse(resp)
 		if err != nil {

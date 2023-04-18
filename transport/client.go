@@ -234,15 +234,15 @@ func (conn *peerConn) readLoop() {
 		}
 
 		// 处理 response
-		call := conn.searchCall(resp.seq)
+		call := conn.searchCall(resp.Seq)
 		if call == nil {
 			// 说明已经被删除了，即超时了，所以不用处理
 			continue
 		}
 
 		// 服务器发生的错误
-		if resp.err != "" {
-			call.err = errors.New(resp.err)
+		if resp.Err != "" {
+			call.err = errors.New(resp.Err)
 		}
 
 		// 必须非阻塞发送，保证超时了就没有接收方在等待该 chan。导致发送阻塞，协程泄露
@@ -250,7 +250,7 @@ func (conn *peerConn) readLoop() {
 		// 具体看 transport.GetFromPeer 和 peerConn.send
 		select {
 		// 发送给阻塞等待方
-		case call.valCh <- resp.value:
+		case call.valCh <- resp.Value:
 		default:
 		}
 	}
@@ -258,7 +258,7 @@ func (conn *peerConn) readLoop() {
 
 func (conn *peerConn) send(c *call) {
 	// 原子增加并返回
-	c.seq = conn.nextSeq.Add(1)
+	c.Seq = conn.nextSeq.Add(1)
 
 	// 注册 call
 	// 什么时候应该把 call 从 map 中删除呢？
@@ -280,7 +280,7 @@ func (conn *peerConn) send(c *call) {
 	// 可以看到 context.Timeout 是直接关闭这个 chan（这个chan是一次性的）。这样反而用处很大，可以多个 G 等待这个chan
 	// 而 time.After 这种，时间到了发送一个 item 到 chan 里，只适合一个 G 在等待
 	<-c.timeout.Done()
-	conn.removeCall(c.seq)
+	conn.removeCall(c.Seq)
 }
 
 func (conn *peerConn) removeCall(seq uint64) {
@@ -292,8 +292,8 @@ func (conn *peerConn) removeCall(seq uint64) {
 
 func (conn *peerConn) addCall(c *call) {
 	conn.callMutex.Lock()
-	conn.calls[c.seq] = c
-	log.Println("peerConn addCall", "seq:", c.seq, "key:", c.key)
+	conn.calls[c.Seq] = c
+	log.Println("peerConn addCall", "seq:", c.Seq, "key:", c.Key)
 	conn.callMutex.Unlock()
 }
 
