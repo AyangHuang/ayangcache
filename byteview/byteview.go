@@ -1,4 +1,4 @@
-package ayangcache
+package byteview
 
 // ByteView 缓存 value
 type ByteView struct {
@@ -7,6 +7,12 @@ type ByteView struct {
 
 func (v ByteView) Len() int {
 	return len(v.b)
+}
+
+func NewByteView(b []byte) ByteView {
+	return ByteView{
+		b: b,
+	}
 }
 
 // ByteSlice 返回的是复制的值，防止缓存被更改
