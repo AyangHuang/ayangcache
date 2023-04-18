@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package protobuf;
+
+option go_package = "./";
+
+message RequestBody {
+  uint64 seq = 1;
+  string key = 2;
+}
+
+message ResponseBody {
+  uint64 seq = 1;
+  bytes value = 2;
+  string err = 3;
+}
