@@ -59,6 +59,10 @@ func (proto *ProtobufCodec) readBody(bytes []byte, lenBytes uint16) error {
 }
 
 func (proto *ProtobufCodec) ReadRequestBody(body *RequestBody) error {
+	if body == nil {
+		return errors.New("nil pointer")
+	}
+
 	// 先读 2 个字节的长度
 	var err error
 	length, err := proto.readFrameLen()
@@ -88,6 +92,10 @@ func (proto *ProtobufCodec) ReadRequestBody(body *RequestBody) error {
 }
 
 func (proto *ProtobufCodec) ReadResponseBody(body *ResponseBody) error {
+	if body == nil {
+		return errors.New("nil pointer")
+	}
+
 	// 先读 2 个字节的长度
 	var err error
 	length, err := proto.readFrameLen()
@@ -116,6 +124,10 @@ func (proto *ProtobufCodec) ReadResponseBody(body *ResponseBody) error {
 }
 
 func (proto *ProtobufCodec) WriteRequest(body *RequestBody) error {
+	if body == nil {
+		return errors.New("nil pointer")
+	}
+
 	var err error
 	message := &protobuf.RequestBody{
 		Seq: body.Seq,
@@ -139,6 +151,10 @@ func (proto *ProtobufCodec) WriteRequest(body *RequestBody) error {
 }
 
 func (proto *ProtobufCodec) WriteResponse(body *ResponseBody) error {
+	if body == nil {
+		return errors.New("nil pointer")
+	}
+
 	var err error
 	message := &protobuf.ResponseBody{
 		Seq:   body.Seq,
