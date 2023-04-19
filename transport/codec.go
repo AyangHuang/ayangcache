@@ -15,6 +15,7 @@ var codecMap = make(map[string]NewCodecFunc)
 
 func init() {
 	codecMap[ProtobufType] = NewProtobufCodec
+	codecMap[JsonType] = NewJsonCodec
 }
 
 type Codec interface {
