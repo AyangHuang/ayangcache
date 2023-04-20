@@ -12,7 +12,7 @@ func TestGroup_Do(t *testing.T) {
 	result := "18"
 	redis["ayang"] = result
 
-	w := sync.WaitGroup{}
+	w := &sync.WaitGroup{}
 	w.Add(1000)
 
 	// Do 获取成功的次数
@@ -25,9 +25,8 @@ func TestGroup_Do(t *testing.T) {
 	for i := 0; i < 1000; i++ {
 		go func() {
 			if str, err := g.Do("ayang", func() (interface{}, error) {
-				// 再检查一次，因为外面的逻辑：（检查没有，执行 Do）不是原子的
+				// 再检查一次，因为外面的逻辑：（检查缓存没有，执行 Do）不是原子的
 				if str, ok := localCache["ayang"]; ok {
-					w.Done()
 					return str, nil
 				}
 
