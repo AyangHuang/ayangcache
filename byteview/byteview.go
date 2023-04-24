@@ -20,12 +20,6 @@ func (v ByteView) ByteSlice() []byte {
 	return cloneBytes(v.b)
 }
 
-func StringToByteView(str string) ByteView {
-	return ByteView{
-		b: []byte(str),
-	}
-}
-
 func (v ByteView) String() string {
 	return string(v.b)
 }
