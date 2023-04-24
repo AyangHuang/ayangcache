@@ -89,7 +89,7 @@ func getFromPeer(t *transport, addr, key string, wg *sync.WaitGroup) {
 // 2. 服务器在处理发送错误并把错误发过来
 // 3. 多个并发请求只会尝试建立连接一次
 func TestTransport_GetFromPeer(t *testing.T) {
-	serverAddr := "127.0.0.1:9999"
+	serverAddr := "127.0.0.1:9980"
 	// 简单服务器模拟，这个 Server 是同步接受和发送的，串行化，处理完一个才能处理下一个
 	go Server(serverAddr)
 	time.Sleep(time.Second)
@@ -113,7 +113,7 @@ func TestTransport_GetFromPeer(t *testing.T) {
 
 // 验证服务器超时场景
 func TestTransport_GetFromPeer_Timeout(t *testing.T) {
-	serverAddr := "127.0.0.1:9999"
+	serverAddr := "127.0.0.1:9981"
 	go Server(serverAddr)
 	time.Sleep(time.Second)
 
@@ -137,7 +137,7 @@ func TestTransport_GetFromPeer_Timeout(t *testing.T) {
 // 1. 服务器处理一半直接该 TCP 关闭（只是关闭该连接，当然会同时关闭监听 socket，用来验证下面的问题）
 // 2. 发送时，发现服务器关闭。
 func TestTransport_GetFromPeer_Close(t *testing.T) {
-	serverAddr := "127.0.0.1:9999"
+	serverAddr := "127.0.0.1:9982"
 	go Server(serverAddr)
 
 	time.Sleep(time.Second)

@@ -31,7 +31,7 @@ var mockGetValueFunc GetValueFunc = func(key string) (byteview.ByteView, error) 
 // 简单的串行化的 Client，反复进行读 request，写 response。不能边读边写。
 func Client(keys ...string) {
 	var err error
-	conn, err := net.Dial("tcp", "127.0.0.1:9999")
+	conn, err := net.Dial("tcp", "127.0.0.1:9990")
 	defer func() {
 		_ = conn.Close()
 	}()
@@ -67,7 +67,7 @@ func Client(keys ...string) {
 }
 
 func TestServer_Serve(t *testing.T) {
-	server := newServer("127.0.0.1:9999", codec, mockGetValueFunc)
+	server := newServer("127.0.0.1:9990", codec, mockGetValueFunc)
 	go server.Serve()
 	time.Sleep(time.Second)
 
