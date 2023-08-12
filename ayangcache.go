@@ -39,7 +39,7 @@ type Group struct {
 }
 
 // NewGroup numCount 为计数器的数量，建议为存储 item 的 10 倍，maxBytes 为最大字节数
-func NewGroup(addr string, getter Getter, numCount, maxBytes int64, codecType string) *Group {
+func NewGroup(addr, registerAddr string, getter Getter, numCount, maxBytes int64, codecType string) *Group {
 	if getter == nil {
 		panic("nil Getter")
 	}
@@ -48,7 +48,7 @@ func NewGroup(addr string, getter Getter, numCount, maxBytes int64, codecType st
 		addr:   addr,
 		getter: getter,
 		cache:  cache.NewCache(numCount, maxBytes),
-		peers:  peer.NewPeer(addr),
+		peers:  peer.NewPeer(addr, registerAddr),
 		loads:  singleflight.NewGroup(),
 	}
 
@@ -146,8 +146,4 @@ func (g *Group) getLocally(key string) (byteview.ByteView, error) {
 	// 尝试加入缓存中
 	g.populateCache(key, val)
 	return val, nil
-}
-
-func (g *Group) RegisterPeers(addr ...string) {
-	g.peers.RegisterPeers(addr...)
 }

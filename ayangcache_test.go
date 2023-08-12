@@ -33,15 +33,13 @@ func (source *mockDataSource) Get(key string) (byteview.ByteView, error) {
 }
 
 func TestGroup_Get(t *testing.T) {
+	// etcdctl del --prefix "/ayangcache"
+	etcdEndPoint := "127.0.0.1:2379"
 	g1Addr, g2Addr, g3Addr := "127.0.0.1:5555", "127.0.0.1:6666", "127.0.0.1:7777"
 
-	g1 := NewGroup(g1Addr, dataSource, 2<<10, 2<<10, transport.ProtobufType)
-	g2 := NewGroup(g2Addr, dataSource, 2<<10, 2<<10, transport.ProtobufType)
-	g3 := NewGroup(g3Addr, dataSource, 2<<10, 2<<10, transport.ProtobufType)
-
-	g1.RegisterPeers(g2Addr, g3Addr)
-	g2.RegisterPeers(g1Addr, g3Addr)
-	g3.RegisterPeers(g1Addr, g2Addr)
+	g1 := NewGroup(g1Addr, etcdEndPoint, dataSource, 2<<10, 2<<10, transport.ProtobufType)
+	g2 := NewGroup(g2Addr, etcdEndPoint, dataSource, 2<<10, 2<<10, transport.ProtobufType)
+	_ = NewGroup(g3Addr, etcdEndPoint, dataSource, 2<<10, 2<<10, transport.ProtobufType)
 
 	var err error
 

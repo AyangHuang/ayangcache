@@ -9,7 +9,6 @@ const (
 type Peer interface {
 	// GetPeer 获取分布式节点，"" 表示本节点
 	GetPeer(key string) string
-	RegisterPeers(addr ...string)
 }
 
 type peer struct {
@@ -17,20 +16,36 @@ type peer struct {
 	// 本节点地址
 	addr string
 	m    *Map
+	// 注册中心
+	register RegistrationCenterClient
 }
 
-func NewPeer(addr string) Peer {
+func NewPeer(localAddr, registerAddr string) Peer {
 	p := &peer{
-		addr: addr,
-		m:    NewMap(virtualPeerNum, nil),
+		addr:     localAddr,
+		m:        NewMap(virtualPeerNum, nil),
+		register: NewEtcdRegistrationCenterClient(localAddr, registerAddr),
 	}
-	p.m.Add(addr)
+
+	// 阻塞等待服务注册和第一次
+	notifyChan := p.register.Notify()
+	p.initPeers(<-notifyChan...)
+
+	// 后面监听
+	go func() {
+		for {
+			select {
+			case nodes := <-notifyChan:
+				p.initPeers(nodes...)
+			}
+		}
+	}()
 	return p
 }
 
-func (p *peer) RegisterPeers(addr ...string) {
+func (p *peer) initPeers(addr ...string) {
 	p.rw.Lock()
-	p.m.Add(addr...)
+	p.m.Init(addr...)
 	p.rw.Unlock()
 }
 

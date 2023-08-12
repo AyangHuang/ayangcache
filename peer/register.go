@@ -31,7 +31,7 @@ type Node struct {
 
 type RegistrationCenterClient interface {
 	// Notify 有新增、删除都会返回当前全部的节点，且必须按照 NodeSsq 从小到大排序
-	Notify() <-chan []Node
+	Notify() <-chan []addr
 	Close()
 }
 
@@ -41,7 +41,7 @@ type etcdRegistrationCenterClient struct {
 	activeNodes []Node
 	// 保证写入 notify 和 close notify 的并发安全，因为写入 closed chan 会 panic，即使有 select 也不能阻止写入 closed chan
 	notifyMutex sync.Mutex
-	notify      chan []Node
+	notify      chan []addr
 	// 停止续期（由于 etcd 提供的 api 是用 context 来控制，所以。。。）
 	cancel context.CancelFunc
 	// 全局关闭控制
@@ -60,7 +60,7 @@ func NewEtcdRegistrationCenterClient(localAddr, etcdEndPoint addr) *etcdRegistra
 		etcdClient:  etcdClient,
 		local:       Node{Addr: localAddr, NodeSeq: nodeSeq},
 		activeNodes: make([]Node, 0),
-		notify:      make(chan []Node, 64),
+		notify:      make(chan []addr, 64),
 		closed:      make(chan struct{}),
 	}
 
@@ -74,7 +74,7 @@ func NewEtcdRegistrationCenterClient(localAddr, etcdEndPoint addr) *etcdRegistra
 	return rcc
 }
 
-func (rcc *etcdRegistrationCenterClient) Notify() <-chan []Node {
+func (rcc *etcdRegistrationCenterClient) Notify() <-chan []addr {
 	return rcc.notify
 }
 
@@ -144,7 +144,7 @@ func (rcc *etcdRegistrationCenterClient) watch(etcdClient *clientv3.Client) {
 		})
 	}
 	// 第一次通知更新
-	rcc.notify <- rcc.activeNodes
+	rcc.notify <- nodesToStrings(rcc.activeNodes)
 
 	go func() {
 		for {
@@ -242,7 +242,7 @@ func (rcc *etcdRegistrationCenterClient) notifySend() {
 	default:
 	}
 
-	rcc.notify <- rcc.activeNodes
+	rcc.notify <- nodesToStrings(rcc.activeNodes)
 }
 
 func (rcc *etcdRegistrationCenterClient) putNode(newNode Node) {
@@ -280,4 +280,12 @@ func formatGetNodeSeq(key string) int {
 	nodeSeqStr := strings.Split(key, "/")[3]
 	nodeSeq, _ := strconv.Atoi(nodeSeqStr)
 	return nodeSeq
+}
+
+func nodesToStrings(nodes []Node) []string {
+	strs := make([]string, 0, len(nodes))
+	for _, node := range nodes {
+		strs = append(strs, node.Addr)
+	}
+	return strs
 }

@@ -31,20 +31,34 @@ func NewMap(replaces int, hash Hash) *Map {
 	return m
 }
 
-func (m *Map) Add(realNode ...string) {
+// Init 为什么每次更新节点（加入或删除）都要重新初始化呢？因为要保证所有节点的 hash 环都一致，否则可能因为先后顺序产生 hash 冲突不一致
+func (m *Map) Init(realNode ...string) {
+	newVirtualRing := make([]int, 0, len(realNode))
+	newHashMap := make(map[int]string, len(realNode)*m.replaces*2)
+
 	for _, v := range realNode {
 		// 1 个真实的节点对应 replace 个虚拟节点
-		for i := 0; i < m.replaces; i++ {
-			// 虚拟节点
-			hash := int(m.hash([]byte(strconv.Itoa(i) + v)))
-			// 存入环
-			m.virtualRing = append(m.virtualRing, hash)
-			// 存储虚拟节点和真实节点的映射
-			m.hashMap[hash] = v
+		for i := 1; i <= m.replaces; i++ {
+			for j := 1; ; j++ {
+				// 虚拟节点
+				hash := int(m.hash([]byte(strconv.Itoa(i*j) + v)))
+				_, ok := newHashMap[hash]
+				if !ok {
+					// 虚拟节点存入环
+					newVirtualRing = append(newVirtualRing, hash)
+					// 存储虚拟节点和真实节点的映射
+					newHashMap[hash] = v
+					break
+				}
+				// 已经存在，hash 冲突，继续下次尝试
+			}
+
 		}
 	}
 
-	sort.Ints(m.virtualRing)
+	sort.Ints(newVirtualRing)
+	m.virtualRing = newVirtualRing
+	m.hashMap = newHashMap
 }
 
 // Get 根据 key 值选择合适的节点
