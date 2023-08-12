@@ -128,8 +128,7 @@ type seq = uint64
 
 type peerConn struct {
 	// 主要是想获取 client.codec，还有从 client 删除这个 peerConn
-	client *client
-	// 0 表示心跳请求
+	client  *client
 	nextSeq atomic.Uint64
 	// 连接的服务端节点地址
 	serverAddr string
