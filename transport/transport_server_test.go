@@ -1,9 +1,9 @@
 package transport
 
 import (
-	"ayangcache/byteview"
 	"errors"
 	"fmt"
+	"github.com/ayanghuang/ayangcache/byteview"
 	"net"
 	"testing"
 	"time"

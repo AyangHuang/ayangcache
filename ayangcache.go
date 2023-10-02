@@ -1,12 +1,12 @@
 package ayangcache
 
 import (
-	"ayangcache/byteview"
-	"ayangcache/cache"
-	"ayangcache/peer"
-	"ayangcache/singleflight"
-	"ayangcache/transport"
 	"fmt"
+	"github.com/ayanghuang/ayangcache/byteview"
+	"github.com/ayanghuang/ayangcache/cache"
+	"github.com/ayanghuang/ayangcache/peer"
+	"github.com/ayanghuang/ayangcache/singleflight"
+	"github.com/ayanghuang/ayangcache/transport"
 	"log"
 )
 

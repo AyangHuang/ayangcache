@@ -1,8 +1,8 @@
 package transport
 
 import (
-	"ayangcache/transport/protobuf"
 	"fmt"
+	"github.com/ayanghuang/ayangcache/transport/protobuf"
 	"github.com/golang/protobuf/proto"
 	"testing"
 )

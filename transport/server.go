@@ -1,7 +1,7 @@
 package transport
 
 import (
-	"ayangcache/byteview"
+	"github.com/ayanghuang/ayangcache/byteview"
 	"github.com/panjf2000/ants/v2"
 	"log"
 	"net"
