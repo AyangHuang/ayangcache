@@ -28,5 +28,4 @@ func TestNewEtcdRegistrationCenterClient(t *testing.T) {
 	}()
 	time.Sleep(20 * time.Second)
 	etcd.Close()
-	<-make(chan struct{})
 }

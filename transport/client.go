@@ -1,8 +1,8 @@
 package transport
 
 import (
-	"ayangcache/singleflight"
 	"errors"
+	"github.com/ayanghuang/ayangcache/singleflight"
 	"log"
 	"net"
 	"sync"

@@ -1,9 +1,9 @@
 package transport
 
 import (
-	"ayangcache/transport/protobuf"
 	"bufio"
 	"errors"
+	"github.com/ayanghuang/ayangcache/transport/protobuf"
 	protoG "github.com/golang/protobuf/proto"
 	"io"
 )
