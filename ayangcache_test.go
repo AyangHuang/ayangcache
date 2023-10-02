@@ -1,10 +1,10 @@
 package ayangcache
 
 import (
-	"ayangcache/byteview"
-	"ayangcache/transport"
 	"errors"
 	"fmt"
+	"github.com/ayanghuang/ayangcache/byteview"
+	"github.com/ayanghuang/ayangcache/transport"
 	"testing"
 	"time"
 )
